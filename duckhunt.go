@@ -23,7 +23,7 @@ func main() {
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_KEY"))
 	if err != nil {
 		log.Panic(err)
-	}
+	}//test
 
 	bot.Debug = true
 
