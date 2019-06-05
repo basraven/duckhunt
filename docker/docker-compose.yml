@@ -1,0 +1,19 @@
+version: "3.7"
+services:
+  duckhunt:
+    build: .
+    ports:
+      - 8086:80
+    env_file:
+    - ./env/credentials.env
+    # command: ["go", "run", "github.com/basraven/duckhunt"]
+    volumes:
+      - ../:/go/src/duckhunt
+    links:
+      - db
+  db:
+    environment:
+    - POSTGRES_PASSWORD=duckhunt
+    - POSTGRES_USER=duckhunt
+    - POSTGRES_DB=duckhunt
+    image: postgres
