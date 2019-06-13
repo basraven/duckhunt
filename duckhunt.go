@@ -12,20 +12,63 @@ import (
 func main() {
 	log.Printf("Starting duckhunt\n")
 
-	byt := []byte(`{"ok":true,"result":[{"update_id":418076391,	"message":{"message_id":27,"from":{"id":861117934,"is_bot":false,"first_name":"Bart","last_name":"van Hunnik","language_code":"nl"},"chat":{"id":861117934,"first_name":"Bart","last_name":"van Hunnik","type":"private"},"date":1559764150,"photo":[{"file_id":"AgADBAAD2K4xGyDowVMP8q7bFCvnog_XLBsABL1hgo6sL4HMFHIEAAEC","file_size":2176,"width":90,"height":90},{"file_id":"AgADBAAD2K4xGyDowVMP8q7bFCvnog_XLBsABN8jTyQ9EQ4LFXIEAAEC","file_size":21651,"width":320,"height":320},{"file_id":"AgADBAAD2K4xGyDowVMP8q7bFCvnog_XLBsABHz2BLw8MzwpFnIEAAEC","file_size":60221,"width":640,"height":640}]}}]}`)
+	data := []byte(`{"ok":true,"result":[{"update_id":418076391,	"message":{"message_id":27,"from":{"id":861117934,"is_bot":false,"first_name":"Bart","last_name":"van Hunnik","language_code":"nl"},"chat":{"id":861117934,"first_name":"Bart","last_name":"van Hunnik","type":"private"},"date":1559764150,"photo":[{"file_id":"AgADBAAD2K4xGyDowVMP8q7bFCvnog_XLBsABL1hgo6sL4HMFHIEAAEC","file_size":2176,"width":90,"height":90},{"file_id":"AgADBAAD2K4xGyDowVMP8q7bFCvnog_XLBsABN8jTyQ9EQ4LFXIEAAEC","file_size":21651,"width":320,"height":320},{"file_id":"AgADBAAD2K4xGyDowVMP8q7bFCvnog_XLBsABHz2BLw8MzwpFnIEAAEC","file_size":60221,"width":640,"height":640}]}}]}`)
 	
-	var dat map[string]interface{}
-	if err := json.Unmarshal(byt, &dat); err != nil {
-		panic(err)
+	type TelegPhoto struct {
+		File_id string `json:"file_id"`
+		File_size int `json:"file_size"`
+		Width int `json:"width"`
+		Height int `json:"height"`
 	}
-	log.Println(dat["result"][])
+
+	type TelegFrom struct {
+		Id int `json:"id"`
+		Is_bot bool `json:"is_bot"`
+		First_name string `json:"first_name"`
+		Last_name string `json:"last_name"`
+		Language_code string `json:"language_code"`
+	}
+
+	type TelegChat struct {
+		Id int `json:"id"`
+		Is_bot bool `json:"is_bot"`
+		First_name string `json:"first_name"`
+		Last_name string `json:"last_name"`
+		Type string `json:"type"`
+	}
+	type TelegMessage struct {
+		Message_id int `json:"message_id"`
+		From TelegFrom `json:"from"`
+		Chat TelegChat `json:"chat"`
+		Photo []TelegPhoto `json:"photo"`
+	}
+	type TelegUpdate struct {
+		UpdateId int `json:"update_id"`
+		Message TelegMessage `json:"message"`
+	}
+	type TelegReturnMessage struct {
+		Result []TelegUpdate `json:"result"`
+	}
+
+
+	var returnMessage TelegReturnMessage
+	if err := json.Unmarshal(data, &returnMessage); err != nil {
+		log.Fatal(err)
+	}
+	// fmt.Printf("%+v\n", returnMessage)
+
+	// var dat map[string]interface{}
+	// if err := json.Unmarshal(byt, &dat); err != nil {
+	// 	panic(err)
+	// }
+	// log.Println(dat["result"])
 
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_KEY"))
 	if err != nil {
 		log.Panic(err)
-	}//test
+	}
 
-	bot.Debug = true
+	// bot.Debug = true
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 
@@ -39,9 +82,9 @@ func main() {
 			continue
 		}
 
-
-
-		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+		// log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+		log.Printf("New message from %s %s", update.Message.From.FirstName, update.Message.From.LastName)
+		log.Printf("%s", update.Message)
 		//SendWithExistingPhoto(update.Message.Chat.ID, update.Message.photo[0].file_id)
 		
 		//msg := tgbotapi.NewPhotoShare(update.Message.Chat.ID, update.Message.Chat.big_file_id)
