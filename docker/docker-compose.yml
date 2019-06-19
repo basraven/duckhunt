@@ -8,7 +8,8 @@ services:
     privileged: true
     env_file:
     - ./env/credentials.env
-    entrypoint: ["dlv", "debug", "/go/src/duckhunt", "--headless", "--listen=:2345", "--log", "--api-version=2"]
+    entrypoint: ["dlv", "debug", "/go/src/duckhunt", "--headless", "--listen=:2345", "--api-version=2"]
+    restart: always
     # command: ["go", "run", "github.com/basraven/duckhunt"]
     volumes:
       - ../:/go/src/duckhunt
@@ -17,6 +18,8 @@ services:
   db:
     logging:
         driver: none
+    ports:
+      - 5432:5432
     environment:
     - POSTGRES_PASSWORD=duckhunt
     - POSTGRES_USER=duckhunt
